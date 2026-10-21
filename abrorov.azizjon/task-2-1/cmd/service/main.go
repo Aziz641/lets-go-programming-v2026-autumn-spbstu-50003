@@ -17,7 +17,7 @@ func main() {
 	sc := bufio.NewScanner(os.Stdin)
 	sc.Split(bufio.ScanWords)
 	out := bufio.NewWriter(os.Stdout)
-	defer out.Flush()
+	defer func() { _ = out.Flush() }()
 
 	next := func() (string, bool) {
 		if !sc.Scan() {
@@ -31,6 +31,7 @@ func main() {
 		return
 	}
 	n, err := strconv.Atoi(tok)
+
 	if err != nil {
 		return
 	}
@@ -41,6 +42,7 @@ func main() {
 			return
 		}
 		k, err := strconv.Atoi(tok)
+
 		if err != nil {
 			return
 		}
@@ -51,7 +53,6 @@ func main() {
 			if !ok {
 				return
 			}
-			// поддерживаем и "<= 23", и "<=23"
 			val := strings.TrimLeft(op, "<>=")
 			op = op[:len(op)-len(val)]
 			if val == "" {
@@ -60,6 +61,7 @@ func main() {
 				}
 			}
 			t, err := strconv.Atoi(val)
+
 			if err != nil {
 				return
 			}
@@ -76,9 +78,9 @@ func main() {
 			}
 
 			if lo <= hi {
-				fmt.Fprintln(out, lo)
+				_, _ = fmt.Fprintln(out, lo)
 			} else {
-				fmt.Fprintln(out, -1)
+				_, _ = fmt.Fprintln(out, -1)
 			}
 		}
 	}
