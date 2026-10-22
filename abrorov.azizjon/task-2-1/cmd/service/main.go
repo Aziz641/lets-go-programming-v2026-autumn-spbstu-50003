@@ -14,53 +14,61 @@ const (
 )
 
 func main() {
-	sc := bufio.NewScanner(os.Stdin)
-	sc.Split(bufio.ScanWords)
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Split(bufio.ScanWords)
 	out := bufio.NewWriter(os.Stdout)
+
 	defer func() { _ = out.Flush() }()
 
-	next := func() (string, bool) {
-		if !sc.Scan() {
+	nextToken := func() (string, bool) {
+		if !scanner.Scan() {
 			return "", false
 		}
-		return sc.Text(), true
+
+		return scanner.Text(), true
 	}
 
-	tok, ok := next()
+	token, ok := nextToken()
 	if !ok {
 		return
 	}
-	n, err := strconv.Atoi(tok)
+
+	numDays, err := strconv.Atoi(token)
 
 	if err != nil {
 		return
 	}
 
-	for d := 0; d < n; d++ {
-		tok, ok = next()
+	for range numDays {
+		token, ok = nextToken()
 		if !ok {
 			return
 		}
-		k, err := strconv.Atoi(tok)
+
+		numConstraints, err := strconv.Atoi(token)
 
 		if err != nil {
 			return
 		}
 
-		lo, hi := minTemp, maxTemp
-		for i := 0; i < k; i++ {
-			op, ok := next()
+		low, high := minTemp, maxTemp
+		for range numConstraints {
+			op, ok := nextToken()
 			if !ok {
 				return
 			}
-			val := strings.TrimLeft(op, "<>=")
-			op = op[:len(op)-len(val)]
-			if val == "" {
-				if val, ok = next(); !ok {
+
+			valueStr := strings.TrimLeft(op, "<>=")
+			op = op[:len(op)-len(valueStr)]
+
+			if valueStr == "" {
+				valueStr, ok = nextToken()
+				if !ok {
 					return
 				}
 			}
-			t, err := strconv.Atoi(val)
+
+			temp, err := strconv.Atoi(valueStr)
 
 			if err != nil {
 				return
@@ -68,17 +76,17 @@ func main() {
 
 			switch op {
 			case ">=":
-				if t > lo {
-					lo = t
+				if temp > low {
+					low = temp
 				}
 			case "<=":
-				if t < hi {
-					hi = t
+				if temp < high {
+					high = temp
 				}
 			}
 
-			if lo <= hi {
-				_, _ = fmt.Fprintln(out, lo)
+			if low <= high {
+				_, _ = fmt.Fprintln(out, low)
 			} else {
 				_, _ = fmt.Fprintln(out, -1)
 			}
