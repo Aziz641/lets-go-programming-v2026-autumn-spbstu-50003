@@ -13,6 +13,18 @@ const (
 	maxTemp = 30
 )
 
+type tokenReader struct {
+	scanner *bufio.Scanner
+}
+
+func (r *tokenReader) next() (string, bool) {
+	if !r.scanner.Scan() {
+		return "", false
+	}
+
+	return r.scanner.Text(), true
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanWords)
@@ -20,33 +32,25 @@ func main() {
 
 	defer func() { _ = out.Flush() }()
 
-	nextToken := func() (string, bool) {
-		if !scanner.Scan() {
-			return "", false
-		}
+	reader := &tokenReader{scanner: scanner}
 
-		return scanner.Text(), true
-	}
-
-	token, hasNext := nextToken()
+	token, hasNext := reader.next()
 	if !hasNext {
 		return
 	}
 
 	numDays, err := strconv.Atoi(token)
-
 	if err != nil {
 		return
 	}
 
 	for range numDays {
-		token, hasNext = nextToken()
+		token, hasNext = reader.next()
 		if !hasNext {
 			return
 		}
 
 		numConstraints, err := strconv.Atoi(token)
-
 		if err != nil {
 			return
 		}
@@ -54,8 +58,8 @@ func main() {
 		low, high := minTemp, maxTemp
 
 		for range numConstraints {
-			operation, ok := nextToken()
-			if !ok {
+			operation, hasNext := reader.next()
+			if !hasNext {
 				return
 			}
 
@@ -63,14 +67,13 @@ func main() {
 			operation = operation[:len(operation)-len(valueStr)]
 
 			if valueStr == "" {
-				valueStr, ok = nextToken()
-				if !ok {
+				valueStr, hasNext = reader.next()
+				if !hasNext {
 					return
 				}
 			}
 
 			temp, err := strconv.Atoi(valueStr)
-
 			if err != nil {
 				return
 			}
