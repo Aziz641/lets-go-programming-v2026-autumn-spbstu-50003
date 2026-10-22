@@ -28,8 +28,8 @@ func main() {
 		return scanner.Text(), true
 	}
 
-	token, ok := nextToken()
-	if !ok {
+	token, hasNext := nextToken()
+	if !hasNext {
 		return
 	}
 
@@ -40,8 +40,8 @@ func main() {
 	}
 
 	for range numDays {
-		token, ok = nextToken()
-		if !ok {
+		token, hasNext = nextToken()
+		if !hasNext {
 			return
 		}
 
@@ -52,14 +52,15 @@ func main() {
 		}
 
 		low, high := minTemp, maxTemp
+
 		for range numConstraints {
-			op, ok := nextToken()
+			operation, ok := nextToken()
 			if !ok {
 				return
 			}
 
-			valueStr := strings.TrimLeft(op, "<>=")
-			op = op[:len(op)-len(valueStr)]
+			valueStr := strings.TrimLeft(operation, "<>=")
+			operation = operation[:len(operation)-len(valueStr)]
 
 			if valueStr == "" {
 				valueStr, ok = nextToken()
@@ -74,7 +75,7 @@ func main() {
 				return
 			}
 
-			switch op {
+			switch operation {
 			case ">=":
 				if temp > low {
 					low = temp
