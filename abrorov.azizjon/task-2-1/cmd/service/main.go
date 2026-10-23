@@ -25,6 +25,38 @@ func (r *tokenReader) next() (string, bool) {
 	return r.scanner.Text(), true
 }
 
+type Thermostat struct {
+	low  int
+	high int
+}
+
+func NewThermostat() *Thermostat {
+	return &Thermostat{
+		low:  minTemp,
+		high: maxTemp,
+	}
+}
+
+func (t *Thermostat) ApplyConstraint(operation string, value int) {
+	switch operation {
+	case ">=":
+		if value > t.low {
+			t.low = value
+		}
+	case "<=":
+		if value < t.high {
+			t.high = value
+		}
+	}
+}
+
+func (t *Thermostat) GetOptimal() int {
+	if t.low <= t.high {
+		return t.low
+	}
+	return -1
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanWords)
@@ -62,10 +94,10 @@ func processDay(reader *tokenReader, out *bufio.Writer) bool {
 		return false
 	}
 
-	low, high := minTemp, maxTemp
+	thermostat := NewThermostat()
 
 	for range numConstraints {
-		if !processConstraint(reader, out, &low, &high) {
+		if !processConstraint(reader, out, thermostat) {
 			return false
 		}
 	}
@@ -73,7 +105,7 @@ func processDay(reader *tokenReader, out *bufio.Writer) bool {
 	return true
 }
 
-func processConstraint(reader *tokenReader, out *bufio.Writer, low, high *int) bool {
+func processConstraint(reader *tokenReader, out *bufio.Writer, thermo *Thermostat) bool {
 	operation, hasNext := reader.next()
 	if !hasNext {
 		return false
@@ -89,27 +121,14 @@ func processConstraint(reader *tokenReader, out *bufio.Writer, low, high *int) b
 		}
 	}
 
-	temp, err := strconv.Atoi(valueStr)
+	val, err := strconv.Atoi(valueStr)
 	if err != nil {
 		return false
 	}
 
-	switch operation {
-	case ">=":
-		if temp > *low {
-			*low = temp
-		}
-	case "<=":
-		if temp < *high {
-			*high = temp
-		}
-	}
+	thermo.ApplyConstraint(operation, val)
 
-	if *low <= *high {
-		_, _ = fmt.Fprintln(out, *low)
-	} else {
-		_, _ = fmt.Fprintln(out, -1)
-	}
+	_, _ = fmt.Fprintln(out, thermo.GetOptimal())
 
 	return true
 }
