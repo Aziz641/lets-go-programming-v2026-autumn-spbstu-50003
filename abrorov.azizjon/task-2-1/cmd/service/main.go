@@ -54,6 +54,7 @@ func (t *Thermostat) GetOptimal() int {
 	if t.low <= t.high {
 		return t.low
 	}
+
 	return -1
 }
 
