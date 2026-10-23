@@ -52,42 +52,42 @@ func main() {
 
 	defer func() { _ = out.Flush() }()
 
-	numDishes, ok := readInt(scanner)
-	if !ok {
+	numDishes, hasNext := readInt(scanner)
+	if !hasNext {
 		return
 	}
 
 	dishRatings := make([]int, 0, numDishes)
 
 	for range numDishes {
-		rating, okRating := readInt(scanner)
-		if !okRating {
+		rating, hasNext := readInt(scanner)
+		if !hasNext {
 			return
 		}
 
 		dishRatings = append(dishRatings, rating)
 	}
 
-	k, ok := readInt(scanner)
-	if !ok {
+	kIndex, hasNext := readInt(scanner)
+	if !hasNext {
 		return
 	}
 
-	if k > len(dishRatings) || k <= 0 {
+	if kIndex > len(dishRatings) || kIndex <= 0 {
 		return
 	}
 
-	h := &intMinHeap{}
-	heap.Init(h)
+	ratingHeap := &intMinHeap{}
+	heap.Init(ratingHeap)
 
 	for _, rating := range dishRatings {
-		if h.Len() < k {
-			heap.Push(h, rating)
-		} else if rating > (*h)[0] {
-			heap.Pop(h)
-			heap.Push(h, rating)
+		if ratingHeap.Len() < kIndex {
+			heap.Push(ratingHeap, rating)
+		} else if rating > (*ratingHeap)[0] {
+			heap.Pop(ratingHeap)
+			heap.Push(ratingHeap, rating)
 		}
 	}
 
-	_, _ = fmt.Fprintln(out, (*h)[0])
+	_, _ = fmt.Fprintln(out, (*ratingHeap)[0])
 }
